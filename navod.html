@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Návod: Infrastruktura experimentu</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0c10;--s1:#111318;--s2:#181c22;--s3:#1e232c;--border:#252b36;--border2:#2e3646;--text:#dce4f0;--text2:#7a8fa8;--text3:#4a5a70;--green:#34d399;--green-d:#0a1f14;--green-b:#134d30;--blue:#60a5fa;--blue-d:#0a1628;--blue-b:#1a3a70;--amber:#fbbf24;--amber-d:#1a1200;--amber-b:#5a3c00;--red:#f87171;--red-d:#1a0a0a;--red-b:#5a1a1a;--purple:#a78bfa;--purple-d:#120e1e;--purple-b:#3a2a6a}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--s1);border-right:1px solid var(--border);overflow-y:auto;padding:1.5rem 0;z-index:100}
+.sidebar-logo{padding:0 1.25rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.sidebar-logo .t1{font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.sidebar-logo .t2{font-size:.7rem;color:var(--text3)}
+.nav-section{padding:.5rem 1.25rem .25rem;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:.5rem}
+.nav-item{display:flex;align-items:center;gap:8px;padding:.5rem 1.25rem;font-size:.8rem;color:var(--text2);cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+.nav-item:hover{color:var(--text);background:var(--s2)}
+.nav-item.active{color:var(--green);border-left-color:var(--green);background:var(--green-d)}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--green)}
+.main{margin-left:240px;padding:2rem 2.5rem 4rem;max-width:860px}
+.section{display:none}
+.section.active{display:block}
+.section-header{margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.section-tag{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem}
+.section-header h1{font-size:1.6rem;font-weight:600;color:var(--text);margin-bottom:.5rem;line-height:1.2}
+.section-header p{font-size:.88rem;color:var(--text2);max-width:600px}
+.steps{display:flex;flex-direction:column;gap:1rem}
+.step{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.step-header{display:flex;align-items:center;gap:12px;padding:1rem 1.25rem;cursor:pointer;user-select:none}
+.step-header:hover{background:var(--s2)}
+.step-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;flex-shrink:0}
+.sn-green{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.sn-blue{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)}
+.sn-amber{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b)}
+.sn-red{background:var(--red-d);color:var(--red);border:1px solid var(--red-b)}
+.sn-purple{background:var(--purple-d);color:var(--purple);border:1px solid var(--purple-b)}
+.step-title{font-size:.9rem;font-weight:500;color:var(--text);flex:1}
+.step-badge{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px}
+.sb-easy{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.sb-free{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)}
+.sb-medium{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b)}
+.chevron{color:var(--text3);font-size:.75rem;transition:transform .2s}
+.step.open .chevron{transform:rotate(90deg)}
+.step-body{display:none;padding:0 1.25rem 1.25rem;border-top:1px solid var(--border)}
+.step.open .step-body{display:block}
+.prose{font-size:.85rem;color:var(--text2);line-height:1.7;margin:.75rem 0}
+.prose strong{color:var(--text);font-weight:500}
+code,.ic{font-family:'JetBrains Mono',monospace;font-size:.82em;background:var(--s3);border:1px solid var(--border2);padding:1px 5px;border-radius:4px;color:var(--green)}
+.cb{background:var(--s3);border:1px solid var(--border2);border-radius:8px;padding:1rem 1.1rem;margin:.75rem 0;font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--text);overflow-x:auto;white-space:pre;line-height:1.7;position:relative}
+.cg{color:var(--green)}.cb2{color:var(--blue)}.ca{color:var(--amber)}.cc{color:var(--text3)}
+.tip{display:flex;gap:10px;border-radius:8px;padding:.8rem 1rem;margin:.75rem 0;font-size:.82rem;line-height:1.6}
+.tip-icon{flex-shrink:0;margin-top:1px}
+.tg{background:var(--green-d);border:1px solid var(--green-b);color:#6ee7b7}
+.tb{background:var(--blue-d);border:1px solid var(--blue-b);color:#93c5fd}
+.ta{background:var(--amber-d);border:1px solid var(--amber-b);color:#fcd34d}
+.tr{background:var(--red-d);border:1px solid var(--red-b);color:#fca5a5}
+.tp{background:var(--purple-d);border:1px solid var(--purple-b);color:#c4b5fd}
+.sl{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin:.75rem 0}
+.sl li{display:flex;align-items:flex-start;gap:10px;font-size:.84rem;color:var(--text2);line-height:1.5}
+.sl li::before{content:attr(data-n);width:20px;height:20px;border-radius:50%;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600;color:var(--text3);flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.dvd{height:1px;background:var(--border);margin:1.25rem 0}
+.ir{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.75rem 0}
+.ic2{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:.75rem .9rem}
+.ic2 .lbl{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.3rem}
+.ic2 .val{font-size:.85rem;color:var(--text);font-weight:500}
+.og{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:2rem}
+.oc{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.oc .on{font-size:1.6rem;font-weight:600;line-height:1;margin-bottom:.4rem}
+.oc .ol{font-size:.78rem;color:var(--text2);line-height:1.4}
+.oc .os{font-size:.72rem;color:var(--text3);margin-top:.5rem}
+.tl{position:relative;padding-left:1.5rem;margin:.75rem 0}
+.tl::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:var(--border2)}
+.tli{position:relative;padding:0 0 1rem 1rem;font-size:.83rem;color:var(--text2);line-height:1.5}
+.tli::before{content:'';position:absolute;left:-.5rem;top:6px;width:8px;height:8px;border-radius:50%;background:var(--border2);border:1px solid var(--border)}
+.tli.d::before{background:var(--green);border-color:var(--green-b)}
+.tli.a::before{background:var(--amber);border-color:var(--amber-b)}
+.tli strong{color:var(--text);font-weight:500;display:block;margin-bottom:2px}
+.url-p{display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--blue)}
+@media(max-width:700px){.sidebar{display:none}.main{margin-left:0;padding:1.25rem}.og{grid-template-columns:1fr}.ir{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo"><div class="t1">Infrastruktura experimentu</div><div class="t2">Kryptologie LS 2026 · Jakubec</div></div>
+  <div class="nav-section">Přehled</div>
+  <a class="nav-item active" onclick="show('overview',this)"><div class="nav-dot"></div>Celkový přehled</a>
+  <div class="nav-section">Hosting &amp; Tracking</div>
+  <a class="nav-item" onclick="show('hosting',this)"><div class="nav-dot"></div>1. GitHub Pages hosting</a>
+  <a class="nav-item" onclick="show('tracking',this)"><div class="nav-dot"></div>2. Měření prokliků</a>
+  <div class="nav-section">Útok 1 – Prarodiče</div>
+  <a class="nav-item" onclick="show('sms',this)"><div class="nav-dot"></div>3. SMS bez spoofingu</a>
+  <div class="nav-section">Útok 2 – Rodiče</div>
+  <a class="nav-item" onclick="show('email',this)"><div class="nav-dot"></div>4. Mailjet e-mail</a>
+  <div class="nav-section">Útok 3 – Vrstevníci</div>
+  <a class="nav-item" onclick="show('messenger',this)"><div class="nav-dot"></div>5. Messenger / IG</a>
+  <div class="nav-section">Finalizace</div>
+  <a class="nav-item" onclick="show('checklist',this)"><div class="nav-dot"></div>6. Checklist &amp; Pořadí</a>
+</nav>
+<main class="main">
+
+<div class="section active" id="s-overview">
+  <div class="section-header"><div class="section-tag">Start zde</div><h1>Celkový přehled infrastruktury</h1><p>Přehled všech komponent experimentu, nástroje a doporučené pořadí.</p></div>
+  <div class="og">
+    <div class="oc"><div class="on" style="color:var(--green)">0 Kč</div><div class="ol">Celkové náklady</div><div class="os">GitHub Pages + Mailjet free + vlastní číslo</div></div>
+    <div class="oc"><div class="on" style="color:var(--blue)">~2h</div><div class="ol">Čas nastavení</div><div class="os">Jednorázové – pak jen odesíláš zprávy</div></div>
+    <div class="oc"><div class="on" style="color:var(--amber)">3×</div><div class="ol">Různé URL pro skupiny</div><div class="os">?skupina=1/2/3 → různé texty na stránce</div></div>
+  </div>
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem">
+    <div style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:1rem">Architektura systému</div>
+    <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.82rem">
+      <div style="display:flex;align-items:center;gap:8px"><span style="background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b);padding:2px 8px;border-radius:4px;font-size:.72rem;font-family:'JetBrains Mono',monospace;white-space:nowrap">SMS</span><span style="color:var(--text3)">→</span><span style="color:var(--text2)">Vlastní číslo → GitHub Pages → index.html?skupina=1</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="background:var(--red-d);color:var(--red);border:1px solid var(--red-b);padding:2px 8px;border-radius:4px;font-size:.72rem;font-family:'JetBrains Mono',monospace;white-space:nowrap">E-mail</span><span style="color:var(--text3)">→</span><span style="color:var(--text2)">Mailjet (custom From jméno) → GitHub Pages → index.html?skupina=2</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);padding:2px 8px;border-radius:4px;font-size:.72rem;font-family:'JetBrains Mono',monospace;white-space:nowrap">Msg/IG</span><span style="color:var(--text3)">→</span><span style="color:var(--text2)">Messenger/IG (story reakce) → GitHub Pages → index.html?skupina=3</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:.5rem;border-top:1px solid var(--border)"><span style="background:var(--green-d);color:var(--green);border:1px solid var(--green-b);padding:2px 8px;border-radius:4px;font-size:.72rem;font-family:'JetBrains Mono',monospace;white-space:nowrap">Data</span><span style="color:var(--text3)">→</span><span style="color:var(--text2)">Cloudflare Web Analytics (free, 0 cookies) → čas + zařízení každého kliknutí</span></div>
+    </div>
+  </div>
+  <div class="tl">
+    <div class="tli d"><strong>Krok 1 – GitHub Pages</strong>Upload landing_page.html (přejmenovat na index.html) + skoleni.html</div>
+    <div class="tli d"><strong>Krok 2 – Cloudflare Analytics</strong>2 řádky scriptu do index.html, sbírá data automaticky</div>
+    <div class="tli a"><strong>Krok 3 – SMS útok</strong>Vlastní číslo, text připraven níže</div>
+    <div class="tli a"><strong>Krok 4 – Mailjet e-mail</strong>Registrace → ověření sender adresy → odeslání</div>
+    <div class="tli a"><strong>Krok 5 – Messenger/IG</strong>Story reakce obejde filtr žádostí</div>
+    <div class="tli"><strong>Krok 6 – Debriefing</strong>skoleni.html prezentace pro celou rodinu</div>
+  </div>
+</div>
+
+<div class="section" id="s-hosting">
+  <div class="section-header"><div class="section-tag">Krok 1</div><h1>GitHub Pages – hosting zdarma</h1><p>Nejjednodušší způsob jak dostat index.html online za 0 Kč.</p></div>
+  <div class="steps">
+    <div class="step open">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-green">1</div><div class="step-title">Vytvoř GitHub účet a repository</div><span class="step-badge sb-free">Zdarma</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="1">Jdi na <code>github.com</code> → Sign up (stačí e-mail)</li>
+          <li data-n="2">Po přihlášení klikni <strong>+ New repository</strong></li>
+          <li data-n="3">Název: <code>soceng-projekt</code>, nastav na <strong>Public</strong></li>
+          <li data-n="4">Zaškrtni <strong>Add a README file</strong> → Create repository</li>
+        </ul>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-green">2</div><div class="step-title">Upload souborů</div><span class="step-badge sb-easy">Snadné</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="1">V repo klikni <strong>Add file → Upload files</strong></li>
+          <li data-n="2">Přetáhni oba soubory: <code>landing_page.html</code> + <code>skoleni.html</code></li>
+          <li data-n="3"><strong>Důležité:</strong> <code>landing_page.html</code> přejmenuj na <code>index.html</code> před uploadem</li>
+          <li data-n="4">Klikni <strong>Commit changes</strong></li>
+        </ul>
+        <div class="tip ta"><span class="tip-icon">!</span><span><code>skoleni.html</code> nech pojmenovaný jako skoleni.html – bude dostupný na /skoleni.html a sdílíš ho až po debriefingu.</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-green">3</div><div class="step-title">Zapnout GitHub Pages</div><span class="step-badge sb-easy">60 sekund</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="1">V repository → <strong>Settings → Pages</strong> (levé menu)</li>
+          <li data-n="2">Branch: <strong>main</strong>, složka: <strong>/ (root)</strong> → Save</li>
+          <li data-n="3">Počkej ~60s → zobrazí se zelená zpráva s URL</li>
+        </ul>
+        <div class="dvd"></div>
+        <div style="font-size:.78rem;color:var(--text3);margin-bottom:.5rem">Výsledné URL pro každou skupinu:</div>
+        <div class="cb"><span class="cc"># Skupina 1 – Prarodiče (SMS)</span>
+<span class="cb2">https://tvoje-jmeno.github.io/soceng-projekt/?skupina=1</span>
+
+<span class="cc"># Skupina 2 – Rodiče (e-mail)</span>
+<span class="cb2">https://tvoje-jmeno.github.io/soceng-projekt/?skupina=2</span>
+
+<span class="cc"># Skupina 3 – Vrstevníci (Messenger/IG)</span>
+<span class="cb2">https://tvoje-jmeno.github.io/soceng-projekt/?skupina=3</span>
+
+<span class="cc"># Skolení (po debriefingu)</span>
+<span class="cb2">https://tvoje-jmeno.github.io/soceng-projekt/skoleni.html</span></div>
+        <div class="tip tg"><span class="tip-icon">✓</span><span>Tyto URL jsou dlouhé – pro SMS je zkrať přes <code>bitly.com</code> nebo <code>tinyurl.com</code> (zdarma). Pro e-mail a chat délka nevadí.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-tracking">
+  <div class="section-header"><div class="section-tag">Krok 2</div><h1>Měření prokliků – Cloudflare Analytics</h1><p>Bezplatná analytika bez cookies. Vidíš přesný čas každého kliknutí, zařízení a skupinu.</p></div>
+  <div class="steps">
+    <div class="step open">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-blue">1</div><div class="step-title">Registrace Cloudflare Web Analytics</div><span class="step-badge sb-free">Zdarma, bez karty</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="1">Jdi na <code>dash.cloudflare.com</code> → Sign up</li>
+          <li data-n="2">V levém menu: <strong>Web Analytics → Add a site</strong></li>
+          <li data-n="3">Zadej URL tvého GitHub Pages (tvoje-jmeno.github.io/soceng-projekt)</li>
+          <li data-n="4">Cloudflare vygeneruje krátký JS snippet s tokenem</li>
+        </ul>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-blue">2</div><div class="step-title">Přidat script do index.html</div><span class="step-badge sb-easy">2 minuty</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <p class="prose">Na GitHubu otevři <code>index.html</code> → klikni na tužku (edit). Před <code>&lt;/body&gt;</code> vlož:</p>
+        <div class="cb"><span class="cg">&lt;script</span> defer src='https://static.cloudflareinsights.com/beacon.min.js'
+  data-cf-beacon='{"token": "<span class="ca">TVŮJ_TOKEN_ZDE</span>"}'<span class="cg">&gt;&lt;/script&gt;</span></div>
+        <div class="tip tb"><span class="tip-icon">ℹ</span><span>Cloudflare Web Analytics nesbírá IP adresy ani cookies, je plně GDPR compliant. Vidíš: čas návštěvy, zemi, zařízení (mobile/desktop), která URL parametr byl použit.</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-blue">3</div><div class="step-title">Co přesně uvidíš v dashboardu</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <div class="ir">
+          <div class="ic2"><div class="lbl">Počet návštěv</div><div class="val" style="font-size:.82rem;color:var(--text2)">Celkem + per skupina podle URL parametru</div></div>
+          <div class="ic2"><div class="lbl">Přesný čas</div><div class="val" style="font-size:.82rem;color:var(--text2)">Timestamp každé návštěvy v reálném čase</div></div>
+          <div class="ic2"><div class="lbl">Zařízení</div><div class="val" style="font-size:.82rem;color:var(--text2)">Mobile / Desktop / Tablet</div></div>
+          <div class="ic2"><div class="lbl">Referrer</div><div class="val" style="font-size:.82rem;color:var(--text2)">Odkud přišli (direct = SMS, e-mail klient...)</div></div>
+        </div>
+        <div class="tip tg"><span class="tip-icon">✓</span><span>Pro analýzu: zapiš si přesný čas odeslání každé zprávy. Návštěva do 30 minut po odeslání = kliknutí. Dashboard se obnovuje živě.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-sms">
+  <div class="section-header"><div class="section-tag">Útok č. 1 – Prarodiče</div><h1>SMS útok – Fio Banka</h1><p>Bez spoofingu – a proč to pro projekt nevadí.</p></div>
+  <div class="steps">
+    <div class="step open">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-amber">1</div><div class="step-title">Proč vlastní číslo funguje stejně dobře</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="→">Prarodiče typicky <strong>nečtou číslo odesílatele</strong> – reagují na obsah. Toto je samo o sobě silný závěr projektu.</li>
+          <li data-n="→">Pokud číslo poznají → záměrně ho neznají (babička ho nezná nazpaměť) → experiment stále funguje.</li>
+          <li data-n="→">Pokud zareagují i přes to, že číslo neznají → dokazuješ zranitelnost vůči neznámým číslům.</li>
+        </ul>
+        <div class="dvd"></div>
+        <p class="prose"><strong>Záložní možnost bez spoofingu:</strong> Předplacená SIM karta (Vodafone/T-Mobile ~99 Kč v trafice). Odešleš z čísla které babička nezná – přidá autentičnost „číslo banky". Plně legální, žádný spoofing.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-amber">2</div><div class="step-title">Finální útočný text SMS</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <div class="cb">Fio Banka: Na vasem uctu bylo zaznamenano
+prihlaseni z noveho zarizeni (Praha, Chrome).
+Pokud jste to nebyli Vy, okamzite potvrdte
+identitu zde:
+
+<span class="cb2">https://bit.ly/ZKRACENA-URL</span>
+
+Pokud jste prihlaseni provedli Vy,
+tuto zpravu ignorujte.</div>
+        <div class="tip ta"><span class="tip-icon">!</span><span>Klíčový detail: <strong>„Praha, Chrome"</strong> – konkrétní lokace + prohlížeč vytváří iluzi legitimního bezpečnostního systému. Poslední věta snižuje podezření – skutečné bankovní alerty ji také obsahují.</span></div>
+        <div class="tip tg"><span class="tip-icon">✓</span><span>URL zkraťte přes <code>bitly.com</code> – zkrácený odkaz vypadá profesionálněji v SMS a neodhaluje github.io. Bitly link nastav na přesměrování na <code>index.html?skupina=1</code>.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-email">
+  <div class="section-header"><div class="section-tag">Útok č. 2 – Rodiče</div><h1>Mailjet – podvodný e-mail od "Finanční správy"</h1><p>Mailjet umožňuje nastavit libovolné "Od:" jméno i adresu. E-mail vypadá jako od státní instituce.</p></div>
+  <div class="steps">
+    <div class="step open">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-red">1</div><div class="step-title">Proč Mailjet, ne Gmail</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <div class="ir">
+          <div class="ic2" style="border-color:var(--red-b)">
+            <div class="lbl" style="color:var(--red)">Gmail – nevhodné</div>
+            <div class="val" style="font-size:.8rem;color:var(--text2);margin-top:4px">Příjemce vidí celou adresu „Jméno &lt;skutecna@gmail.com&gt;". Gmail přidává varování „via gmail.com". Žádná kontrola nad hlavičkami.</div>
+          </div>
+          <div class="ic2" style="border-color:var(--green-b)">
+            <div class="lbl" style="color:var(--green)">Mailjet – ideální</div>
+            <div class="val" style="font-size:.8rem;color:var(--text2);margin-top:4px">Nastavíš přesné „Od:" jméno. Free tier = 200 e-mailů/den. Profesionální doručení, bez spam varování.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-red">2</div><div class="step-title">Registrace a nastavení Mailjet</div><span class="step-badge sb-free">Free tier stačí</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="1">Jdi na <code>mailjet.com</code> → Sign Up Free</li>
+          <li data-n="2">Ověř svůj skutečný e-mail (pro přihlášení do Mailjet)</li>
+          <li data-n="3">Dashboard → <strong>Account → Sender domains &amp; addresses</strong></li>
+          <li data-n="4">Klikni <strong>Add a Sender Address</strong> (ne doménu, jen adresu)</li>
+          <li data-n="5">Zadej <code>podatelna.fin.sprava@gmail.com</code> (vytvoř tuto Gmail adresu předem)</li>
+          <li data-n="6">Mailjet pošle ověřovací e-mail na tuto adresu – ověř ji kliknutím</li>
+        </ul>
+        <div class="tip tb"><span class="tip-icon">ℹ</span><span>Nepotřebuješ vlastní doménu. Gmail adresa <code>podatelna.fin.sprava@gmail.com</code> jako sender adresa v Mailjet stačí. Příjemce uvidí jako „Od:" pouze to co nastavíš v kampani.</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-red">3</div><div class="step-title">Nastavení e-mailu v Mailjet editoru</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <div class="cb"><span class="cc">Sender name (zobrazené jméno):</span>
+<span class="ca">Finanční správa ČR</span>
+
+<span class="cc">Sender address (ověřená adresa):</span>
+<span class="ca">podatelna.fin.sprava@gmail.com</span>
+
+<span class="cc">Předmět:</span>
+<span class="cg">Oznámení o vrácení přeplatku daně z příjmu – 1 847 Kč</span>
+
+<span class="cc">Reply-To (volitelné, zvyšuje důvěryhodnost):</span>
+<span class="ca">noreply@financni-sprava.cz</span></div>
+        <div class="dvd"></div>
+        <p class="prose" style="margin-bottom:.5rem"><strong>Tělo e-mailu:</strong></p>
+        <div class="cb" style="font-size:.74rem">Vážená paní / Vážený pane,
+
+na základě zpracování daňového přiznání za zdaňovací
+období <span class="ca">2025</span> Vám vznikl přeplatek daně z příjmu
+fyzických osob ve výši <span class="ca">1 847,00 Kč</span>.
+
+Přeplatek bude automaticky převeden na úhradu jiných
+daňových závazků, pokud do <span class="ca">30. dubna 2026</span>
+nepotvrdíte bankovní účet pro vrácení prostřednictvím
+níže uvedeného odkazu.
+
+<span class="cb2">[ POTVRDIT ÚČET PRO VRÁCENÍ PŘEPLATKU ]</span>
+→ https://tvoje-jmeno.github.io/soceng-projekt/?skupina=2
+
+S pozdravem,
+Oddělení správy daní
+<span class="ca">Finanční správa České republiky</span>
+Lazarská 15/7, 117 22 Praha 1</div>
+        <div class="tip ta"><span class="tip-icon">!</span><span>Adresa <strong>Lazarská 15/7</strong> je skutečná adresa Finanční správy ČR. Datum <strong>30. dubna</strong> je reálný termín daňového přiznání. Tyto detaily dramaticky zvyšují věrohodnost.</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-red">4</div><div class="step-title">Alternativa: SendGrid</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <p class="prose">Pokud Mailjet nefunguje (občas odmítá nové účty bez ověření): <code>sendgrid.com</code> → 100 e-mailů/den zdarma. Postup identický – přidáš sender adresu, ověříš, odesíláš. SendGrid vyžaduje trochu více údajů při registraci ale je spolehlivější pro doručení.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-messenger">
+  <div class="section-header"><div class="section-tag">Útok č. 3 – Vrstevníci</div><h1>Messenger / Instagram – obejití filtru žádostí</h1><p>Jak dostat zprávu přímo do hlavního chatu bez čekání na přijetí žádosti.</p></div>
+  <div class="steps">
+    <div class="step open">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-purple">1</div><div class="step-title">Jak filtr žádostí funguje a jak ho obejít</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <p class="prose">Facebook/Instagram přesouvá zprávy od neznámých do „Žádostí o zprávy" bez notifikace. Čtyři způsoby jak to obejít:</p>
+        <div class="ir">
+          <div class="ic2" style="border-color:var(--green-b)"><div class="lbl" style="color:var(--green)">A – IG Story reakce ⭐</div><div class="val" style="font-size:.8rem;color:var(--text2);margin-top:4px">Zareaguj na jejich IG story emotikonem → DM jde přímo do hlavního chatu. Nejspolehlivější metoda.</div></div>
+          <div class="ic2" style="border-color:var(--green-b)"><div class="lbl" style="color:var(--green)">B – Skupinový chat</div><div class="val" style="font-size:.8rem;color:var(--text2);margin-top:4px">Přidej cíl do existující skupiny kde jste oba → zprávy tam jdou přímo, bez filtru.</div></div>
+          <div class="ic2" style="border-color:var(--green-b)"><div class="lbl" style="color:var(--green)">C – Messenger.com na PC</div><div class="val" style="font-size:.8rem;color:var(--text2);margin-top:4px">Méně striktní filtrování než mobilní aplikace při sdílené skupině nebo kontaktu.</div></div>
+          <div class="ic2" style="border-color:var(--amber-b)"><div class="lbl" style="color:var(--amber)">D – Dočasné přátelství</div><div class="val" style="font-size:.8rem;color:var(--text2);margin-top:4px">Falešný profil → žádost o přátelství → cíl přijme → odešli zprávu → zruš přátelství.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-purple">2</div><div class="step-title">Doporučený postup: IG Story reakce</div><span class="step-badge sb-easy">Nejspolehlivější</span><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="1">Vytvoř nový IG účet se jménem spolužáka (nebo kamaráda)</li>
+          <li data-n="2">Přidej profilovku + 2-3 příspěvky aby profil vypadal reálně</li>
+          <li data-n="3">Sleduj profil cíle – čekej na story (nebo sleduj jejich aktivitu)</li>
+          <li data-n="4">Zareaguj na story emotikonem → automaticky se otevře DM v hlavním chatu</li>
+          <li data-n="5">V té DM konverzaci okamžitě odešli baiting zprávu s odkazem</li>
+        </ul>
+        <div class="tip tp"><span class="tip-icon">↑</span><span>Pokud cíl nemá IG nebo stories nepřidává: použij metodu B (skupinový chat) nebo D (dočasné přátelství přes falešný FB profil).</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-purple">3</div><div class="step-title">Finální útočný text</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <div class="cb">Čau, posílám ti ty poznámky ze statistiky
+co jsem sliboval. Sdílím přes Google Docs,
+přihlas se tam Google účtem:
+
+<span class="cb2">https://tvoje-jmeno.github.io/soceng-projekt/?skupina=3</span>
+
+Ale rychle, link vyprší za hodinu,
+pak to musím znova sdílet přes školu
+a to trvá věčnost</div>
+        <div class="tip tp"><span class="tip-icon">↑</span><span>Poslední věta je klíčová – logicky vysvětluje proč link „vyprší" a proč musí jednat rychle. Bez ní zní urgence podezřele. S ní zní přirozeně.</span></div>
+        <div class="tip ta"><span class="tip-icon">!</span><span>Přizpůsob „poznámky ze statistiky" reálnému kontextu – pokud cíl nemá zkoušku, použij „fotky z víkendu" nebo „sdílený playlist". Princip je identický.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-checklist">
+  <div class="section-header"><div class="section-tag">Finalizace</div><h1>Checklist a doporučené pořadí útoků</h1><p>Projdi každý bod před odesláním první zprávy. Pořadí je důležité – rodina si nesmí říct o experimentu navzájem.</p></div>
+  <div class="steps">
+    <div class="step open">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-green">✓</div><div class="step-title">Technická příprava</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <ul class="sl">
+          <li data-n="□">GitHub Pages je online, index.html se zobrazuje</li>
+          <li data-n="□">Všechny tři URL (?skupina=1/2/3) zobrazují správný text</li>
+          <li data-n="□">Cloudflare Analytics script je v index.html</li>
+          <li data-n="□">Mailjet sender je ověřen, test e-mail dorazil do schránky</li>
+          <li data-n="□">SMS text připraven, URL zkrácena přes Bitly</li>
+          <li data-n="□">IG falešný profil vytvořen a věrohodně vypadá</li>
+        </ul>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-blue">i</div><div class="step-title">Co zaznamenávat – datová tabulka</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <div class="cb"><span class="cc">Pro každou testovanou osobu:</span>
+
+<span class="cg">Skupina:</span>         1 / 2 / 3
+<span class="cg">Čas odeslání:</span>    HH:MM DD.MM.RRRR
+<span class="cg">Klikl/a:</span>         Ano / Ne  (Cloudflare dashboard)
+<span class="cg">Čas kliknutí:</span>    HH:MM  (Cloudflare)
+<span class="cg">Prodleva:</span>        Minuty od odeslání do kliknutí
+<span class="cg">Reakce:</span>          Ignoroval / Kliknul / Ověřoval jinak / Upozornil
+<span class="cg">Zařízení:</span>        Mobile / Desktop  (Cloudflare)
+<span class="cg">Poznámky:</span>        Zavolal? Napsal? Zeptal se osobně?</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-header" onclick="tog(this)"><div class="step-num sn-red">→</div><div class="step-title">Doporučené pořadí – proč záleží na sekvenci</div><span class="chevron">▶</span></div>
+      <div class="step-body">
+        <p class="prose">Nespouštěj všechny útoky ve stejný den. Rodina si může říct „dostal/a jsi divnou zprávu?" a experiment je zničen.</p>
+        <div class="tl" style="margin-top:.75rem">
+          <div class="tli d"><strong>Den 1 – Vrstevníci (Messenger/IG)</strong>Spusť jako první. Nejméně pravděpodobní že to řeknou rodičům nebo prarodičům.</div>
+          <div class="tli d"><strong>Den 3 – Prarodiče (SMS)</strong>Prarodiče typicky nekomunikují s rodiči o digitálních věcech každý den.</div>
+          <div class="tli a"><strong>Den 5 – Rodiče (e-mail)</strong>Jako poslední – rodiče jsou v největším kontaktu s oběma skupinami a mohl by od nich uniknout hint.</div>
+          <div class="tli"><strong>Den 7 – Debriefing</strong>Odhalení experimentu + schulung přes skoleni.html pro všechny najednou.</div>
+        </div>
+        <div class="tip tg"><span class="tip-icon">✓</span><span>Ideální je debriefing při rodinném setkání (večeře, víkend) – máš všechny pohromadě a můžeš ukázat skoleni.html na televizi nebo projektoru.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+<script>
+function show(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({top:0});
+}
+function tog(header){
+  header.parentElement.classList.toggle('open');
+}
+</script>
+</body>
+</html>
