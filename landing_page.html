@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oznámení o projektu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0f1117;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .card {
+    background: #1a1d27;
+    border: 1px solid #2a2d3a;
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    overflow: hidden;
+    animation: slideUp 0.5s ease forwards;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .banner {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f2340 100%);
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 1px solid #2a2d3a;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #f0c040;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 28px;
+  }
+
+  .banner-text h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.3;
+  }
+
+  .banner-text p {
+    font-size: 0.78rem;
+    color: #8a9bb5;
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .body {
+    padding: 1.75rem 2rem;
+  }
+
+  .alert-box {
+    background: #1c2f1c;
+    border: 1px solid #2d5a2d;
+    border-left: 4px solid #4caf50;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .alert-box p {
+    color: #a5d6a7;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .alert-box strong {
+    color: #c8e6c9;
+  }
+
+  .section-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #8a9bb5;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .what-happened {
+    margin-bottom: 1.5rem;
+  }
+
+  .what-happened p {
+    font-size: 0.88rem;
+    color: #c8cdd8;
+    line-height: 1.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .method-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+
+  .badge-sms { background: #1e2f4a; color: #64b5f6; border: 1px solid #1565c0; }
+  .badge-email { background: #2f1e1e; color: #ef9a9a; border: 1px solid #b71c1c; }
+  .badge-social { background: #1e2f1e; color: #a5d6a7; border: 1px solid #1b5e20; }
+
+  .trigger-list {
+    list-style: none;
+    margin-bottom: 1.5rem;
+  }
+
+  .trigger-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #1f2230;
+    font-size: 0.85rem;
+    color: #c8cdd8;
+    line-height: 1.5;
+  }
+
+  .trigger-list li:last-child { border-bottom: none; }
+
+  .trigger-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .ti-fear { background: #3a1a1a; color: #ef5350; }
+  .ti-auth { background: #1a2a3a; color: #42a5f5; }
+  .ti-urgent { background: #3a2a1a; color: #ffa726; }
+  .ti-curiosity { background: #1a3a2a; color: #66bb6a; }
+
+  .footer-note {
+    background: #12141e;
+    border: 1px solid #1f2230;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .footer-note p {
+    font-size: 0.82rem;
+    color: #7a8599;
+    line-height: 1.6;
+  }
+
+  .footer-note strong {
+    color: #9eadc8;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #1f2230;
+  }
+
+  .logo-row span {
+    font-size: 0.78rem;
+    color: #555d70;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2d5a2d;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="banner">
+    <div class="icon-wrap">&#9888;</div>
+    <div class="banner-text">
+      <h1>Toto je součástí školního projektu</h1>
+      <p>VŠB-TUO &bull; Kryptologie LS 2026 &bull; Dominik Jakubec</p>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="alert-box">
+      <p><strong>Jste v bezpečí.</strong> Žádné vaše údaje nebyly zaznamenány ani odeslány. Odkaz, na který jste klikl/a, byl součástí kontrolovaného experimentu a vedl výhradně na tuto stránku.</p>
+    </div>
+
+    <div class="what-happened">
+      <div class="section-title">Co se právě stalo</div>
+      <p id="desc-main">Obdrželi jste zprávu, která napodobovala komunikaci skutečné instituce nebo osoby. Taková technika se nazývá <strong id="method-name" style="color:#c8cdd8;">sociální inženýrství</strong>.</p>
+      <p style="margin-top:0.5rem;">Zpráva záměrně aktivovala jeden nebo více psychologických spouštěčů:</p>
+    </div>
+
+    <ul class="trigger-list" id="triggers">
+      <li>
+        <div class="trigger-icon ti-fear">&#9679;</div>
+        <span><strong style="color:#ef9a9a;">Strach</strong> – hrozba ztráty peněz, přístupu nebo problémů s úřadem.</span>
+      </li>
+      <li>
+        <div class="trigger-icon ti-auth">&#9679;</div>
+        <span><strong style="color:#90caf9;">Autorita</strong> – zpráva se tvářila jako od banky, státní instituce nebo kolegy.</span>
+      </li>
+      <li>
+        <div class="trigger-icon ti-urgent">&#9679;</div>
+        <span><strong style="color:#ffcc80;">Časový tlak</strong> – urgentní termín zabraňuje klidnému ověření informace.</span>
+      </li>
+      <li>
+        <div class="trigger-icon ti-curiosity">&#9679;</div>
+        <span><strong style="color:#a5d6a7;">Zvědavost/přínos</strong> – nabídka čehosi lákavého nebo exkluzivního.</span>
+      </li>
+    </ul>
+
+    <div class="footer-note">
+      <p>Experiment proběhne u všech sledovaných skupin a výsledky budou anonymizovány. Veškeré podrobnosti vám vysvětlí <strong>Dominik Jakubec</strong> osobně při setkání, kde proběhne i školení v rozpoznávání podobných útoků.</p>
+      <p style="margin-top:0.5rem;">Pokud máte okamžité otázky, volejte nebo pište přímo jemu.</p>
+    </div>
+
+    <div class="logo-row">
+      <div class="dot"></div>
+      <span>Data z tohoto kliknutí nejsou sbírána &bull; Stránka slouží výhradně k informování</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const skupina = params.get('skupina');
+
+  const configs = {
+    '1': {
+      desc: 'Obdrželi jste SMS zprávu napodobující komunikaci od banky nebo státní instituce. Tato technika se nazývá <strong style="color:#c8cdd8;">smishing</strong> (SMS phishing).',
+      method: 'Smishing (podvodná SMS)',
+      badge: 'badge-sms'
+    },
+    '2': {
+      desc: 'Obdrželi jste e-mail napodobující úřední komunikaci. Tato technika se nazývá <strong style="color:#c8cdd8;">spear-phishing</strong> – cílený podvodný e-mail.',
+      method: 'Spear-Phishing (podvodný e-mail)',
+      badge: 'badge-email'
+    },
+    '3': {
+      desc: 'Obdrželi jste zprávu přes sociální síť nebo chat, která vás lákala na odkaz vyžadující přihlášení. Tato technika se nazývá <strong style="color:#c8cdd8;">baiting</strong> – nastražení návnady.',
+      method: 'Baiting (phishing přes sociální sítě)',
+      badge: 'badge-social'
+    }
+  };
+
+  if (skupina && configs[skupina]) {
+    const c = configs[skupina];
+    document.getElementById('desc-main').innerHTML = c.desc;
+    const mn = document.getElementById('method-name');
+    mn.textContent = c.method;
+    mn.className = 'method-badge ' + c.badge;
+    mn.style.color = '';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Školení: Sociální inženýrství</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1f2937;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --red: #f85149;
+  --red-bg: #1c0a0a;
+  --red-border: #6e1a1a;
+  --green: #3fb950;
+  --green-bg: #0a1c0a;
+  --green-border: #1a6e1a;
+  --blue: #58a6ff;
+  --blue-bg: #0a1628;
+  --blue-border: #1a3a6e;
+  --amber: #e3b341;
+  --amber-bg: #1c1400;
+  --amber-border: #6e4c00;
+  --accent: #238636;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.nav-sub { font-size: 0.75rem; color: var(--text2); margin-top: 1px; }
+
+.progress-bar {
+  height: 3px;
+  background: var(--border);
+  flex: 1;
+  margin: 0 1.5rem;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.slide-counter { font-size: 0.8rem; color: var(--text2); white-space: nowrap; }
+
+.slides-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+
+.slide { display: none; animation: fadeIn 0.35s ease; }
+.slide.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 640px;
+}
+
+.highlight { color: var(--red); font-style: italic; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.card h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.card p {
+  font-size: 0.82rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+.msg-demo {
+  margin-bottom: 1.5rem;
+}
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.msg-type {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.mt-sms { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+.mt-email { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.mt-chat { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.mt-warning { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+
+.msg-bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.7;
+  position: relative;
+}
+
+.flag {
+  display: inline;
+  background: var(--red-bg);
+  border: 1px solid var(--red-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.82em;
+  color: var(--red);
+  cursor: help;
+  position: relative;
+}
+
+.flag-note {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  background: #2d1414;
+  border: 1px solid var(--red-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.78rem;
+  color: #ffb3b3;
+  width: 220px;
+  line-height: 1.5;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.flag:hover .flag-note { display: block; }
+
+.red-flags-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.red-flags-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--red-bg);
+  border: 1px solid var(--red-border);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.84rem;
+  color: #ffb3b3;
+  line-height: 1.5;
+}
+
+.rf-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--red-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  color: var(--red);
+}
+
+.defense-card {
+  display: flex;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.def-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.defense-card h3 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.defense-card p {
+  font-size: 0.82rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.quiz-q {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.quiz-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+  line-height: 1.5;
+}
+
+.quiz-btn:hover { border-color: #444d56; background: var(--surface2); }
+.quiz-btn.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.quiz-btn.wrong { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+
+.quiz-feedback {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.quiz-feedback.show { display: block; }
+
+.nav-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.2s;
+  border: 1px solid;
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text2);
+}
+
+.btn-secondary:hover { border-color: #444d56; color: var(--text); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover { opacity: 0.9; }
+
+.info-box {
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  color: #90c8ff;
+  line-height: 1.6;
+}
+
+.final-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.final-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.final-card h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.final-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.final-card ul li {
+  font-size: 0.8rem;
+  color: var(--text2);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.final-card ul li::before {
+  content: '→';
+  color: var(--accent);
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+  h2 { font-size: 1.4rem; }
+  .stat-row { grid-template-columns: 1fr; }
+  .final-grid { grid-template-columns: 1fr; }
+  .nav { padding: 0.75rem 1rem; }
+  .slides-wrap { padding: 1.5rem 1rem 5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div>
+    <div class="nav-title">Školení: Sociální inženýrství</div>
+    <div class="nav-sub">Kryptologie LS 2026 · Dominik Jakubec</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+  <div class="slide-counter" id="counter">1 / 8</div>
+</nav>
+
+<div class="slides-wrap">
+
+  <!-- Slide 1: Intro -->
+  <div class="slide active" id="s1">
+    <div class="slide-label">Úvod</div>
+    <h2>Právě jste byli součástí experimentu.</h2>
+    <div class="subtitle">Zprávy, které jste v posledních dnech obdrželi, nebyly skutečné. Byly součástí řízeného výzkumu v rámci bakalářské práce z&nbsp;kryptologie. Toto školení vysvětlí, co se stalo a jak se&nbsp;bránit.</div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">&#128100;</div>
+        <h3>3 generace</h3>
+        <p>Prarodiče, rodiče a vrstevníci – každá skupina dostala jiný typ útoku přizpůsobený jejich digitálním návykům.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#129302;</div>
+        <h3>AI jako zbraň</h3>
+        <p>Texty byly generovány nebo vylepšeny umělou inteligencí – proto jsou bez chyb a zní uvěřitelně.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#128274;</div>
+        <h3>Žádná data</h3>
+        <p>Žádné heslo, číslo karty ani osobní údaj nebyl zaznamenán. Experiment byl čistě detekční.</p>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-primary" onclick="go(2)">Začít školení →</button>
+    </div>
+  </div>
+
+  <!-- Slide 2: Co je sociální inženýrství -->
+  <div class="slide" id="s2">
+    <div class="slide-label">Základy</div>
+    <h2>Proč technické zabezpečení nestačí</h2>
+    <div class="subtitle">Hackeři čím dál méně útočí na počítače. Útočí na <span class="highlight">lidi</span>. Je totiž mnohem snazší přesvědčit člověka, aby heslo prozradil sám, než ho prolomit.</div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num" style="color: var(--red);">91%</div>
+        <div class="stat-label">kybernetických útoků začíná phishingovou zprávou</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color: var(--amber);">17s</div>
+        <div class="stat-label">průměrná doba, za kterou někdo klikne na phishingový odkaz</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color: var(--blue);">AI</div>
+        <div class="stat-label">odstranila jazykové chyby – hlavní způsob jak podvody poznat</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Sociální inženýrství</strong> je manipulace lidí k&nbsp;provedení akce nebo prozrazení informace, které by za normálních okolností neudělali. Obchází technická bezpečnostní opatření tím, že útočí na lidskou psychiku – nikoliv na software.
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(1)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(3)">Útok 1: SMS →</button>
+    </div>
+  </div>
+
+  <!-- Slide 3: Útok 1 - SMS/Smishing -->
+  <div class="slide" id="s3">
+    <div class="slide-label">Útok č. 1 · Prarodiče</div>
+    <h2>Smishing – podvodná SMS od &ldquo;banky&rdquo;</h2>
+    <div class="subtitle">Zpráva napodobovala SMS alert od banky o podezřelém přihlášení. Najeďte myší na červeně označené části pro vysvětlení.</div>
+
+    <div class="msg-demo">
+      <div class="msg-header">
+        <div>
+          <span style="font-size:0.82rem;color:var(--text2);">Odesílatel: </span>
+          <span style="font-size:0.82rem;color:var(--text);">CSOB-Banka</span>
+        </div>
+        <span class="msg-type mt-sms">SMS zpráva</span>
+      </div>
+      <div class="msg-bubble">
+        <span class="flag">ČSOB<span class="flag-note">&#9888; Jméno odesílatele lze u SMS libovolně podvrhnout (tzv. SMS spoofing). Banka za vás nikdy nebude jednat takto urgentně přes SMS odkaz.</span></span>:
+        Zaznamenali jsme prihlaseni z
+        <span class="flag">noveho zarizeni<span class="flag-note">&#9888; Obecná formulace. Útočník neví nic o vašem zařízení – sází na to, že vás to vyděsí.</span></span>
+        do vaseho uctu. Pokud jste to nebyli vy, okamzite zablokovani pristup:
+        <span class="flag">csob-bezpecnost.cz/overeni<span class="flag-note">&#9888; Falešná doména! Skutečná banka nikdy neposílá odkaz na ověření přes SMS. Vždy jděte přímo na web banky napsáním adresy do prohlížeče.</span></span>
+        . Reakce do
+        <span class="flag">15 minut<span class="flag-note">&#9888; Umělý časový tlak. Cílem je zabránit vám přemýšlet a ověřovat.</span></span>
+        .
+      </div>
+    </div>
+
+    <ul class="red-flags-list">
+      <li><div class="rf-num">1</div>Odkaz v SMS nikdy nevede na legitimní bankovní web – vždy zadejte adresu banky ručně.</li>
+      <li><div class="rf-num">2</div>Jméno odesílatele SMS lze lehce zfalšovat – nezaručuje totožnost.</li>
+      <li><div class="rf-num">3</div>Extrémně krátký časový limit (15 min) je klasický nástroj pro potlačení kritického myšlení.</li>
+      <li><div class="rf-num">4</div>Banka vás při skutečném problému vždy kontaktuje přes aplikaci nebo vás požádá, abyste zavolali na číslo z jejich webu.</li>
+    </ul>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(2)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(4)">Útok 2: E-mail →</button>
+    </div>
+  </div>
+
+  <!-- Slide 4: Útok 2 - Email -->
+  <div class="slide" id="s4">
+    <div class="slide-label">Útok č. 2 · Rodiče</div>
+    <h2>Spear-Phishing – daňový přeplatek</h2>
+    <div class="subtitle">E-mail napodoboval Finanční správu ČR s oznámením o vrácení přeplatku. Tento typ útoku je obzvlášť záludný – <span class="highlight">nesází na strach, ale na radost z peněz</span>.</div>
+
+    <div class="msg-demo">
+      <div class="msg-header">
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <span style="font-size:0.82rem;color:var(--text2);">Od: <span style="color:var(--text);">podatelna@financni-sprava-cr.info</span></span>
+          <span style="font-size:0.82rem;color:var(--text2);">Předmět: <strong style="color:var(--text);">Máte nárok na vrácení přeplatku daně – 1&nbsp;847 Kč</strong></span>
+        </div>
+        <span class="msg-type mt-email">E-mail</span>
+      </div>
+      <div class="msg-bubble" style="font-size:0.86rem;">
+        Vážená paní / Vážený pane,<br><br>
+        na základě zpracování daňového přiznání za zdaňovací období 2025 Vám vznikl
+        <span class="flag">přeplatek daně z příjmu fyzických osob ve výši 1&nbsp;847&nbsp;Kč<span class="flag-note">&#9888; Konkrétní částka zvyšuje důvěryhodnost. Útočník ji vymyslel – ví, že specifické číslo působí reálněji než kulatá suma.</span></span>.<br><br>
+        Přeplatek bude
+        <span class="flag">automaticky použit na jiné daňové závazky<span class="flag-note">&#9888; Hrozba ztráty peněz = urgence. Vytváří pocit, že musíte jednat teď.</span></span>,
+        pokud do
+        <span class="flag">30. dubna 2026 nepotvrdíte číslo bankovního účtu<span class="flag-note">&#9888; Blíží se daňový termín – útočník toto datum vybral záměrně, aby zpráva dávala smysl v daném čase roku.</span></span>
+        pro vrácení.<br><br>
+        Pro potvrzení účtu klikněte na:
+        <span style="color:var(--blue);text-decoration:underline;" class="flag">Přejít na portál Finanční správy<span class="flag-note">&#9888; Skutečný odkaz vede na falešnou doménu (financni-sprava-cr.info místo fs.mfcr.cz). Vždy zkontrolujte celou adresu odkazu před kliknutím!</span></span><br><br>
+        S pozdravem,<br>
+        <span class="flag">Oddělení správy daní, Finanční správa ČR<span class="flag-note">&#9888; Formální podpis nevyžaduje žádné ověření. Každý ho může napsat.</span></span>
+      </div>
+    </div>
+
+    <ul class="red-flags-list">
+      <li><div class="rf-num">1</div>Doména odesílatele: „financni-sprava-cr.info" místo „fs.mfcr.cz" – vždy zkontrolujte celou e-mailovou adresu za zavináčem.</li>
+      <li><div class="rf-num">2</div>Reálná Finanční správa nikdy nepožaduje potvrzení účtu e-mailem – vše se řeší přes datovou schránku nebo přímo v aplikaci.</li>
+      <li><div class="rf-num">3</div>Pozitivní spouštěč (dostanete peníze!) je zákeřnější než strach – méně jsme v pohotovosti vůči podvodům, které nám nabízejí výhodu.</li>
+    </ul>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(3)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(5)">Útok 3: Chat →</button>
+    </div>
+  </div>
+
+  <!-- Slide 5: Útok 3 - Baiting -->
+  <div class="slide" id="s5">
+    <div class="slide-label">Útok č. 3 · Vrstevníci</div>
+    <h2>Baiting – sdílené poznámky ke zkoušce</h2>
+    <div class="subtitle">Zpráva přišla jako od spolužáka se sdíleným Google dokumentem. Cílí na <span class="highlight">akademický stres</span> a důvěru k&nbsp;lidem, které znáte.</div>
+
+    <div class="msg-demo">
+      <div class="msg-header">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:var(--text);">MK</div>
+          <span style="font-size:0.85rem;color:var(--text);">Martin K.</span>
+          <span style="font-size:0.75rem;color:var(--text2);">· Discord</span>
+        </div>
+        <span class="msg-type mt-chat">Sociální síť</span>
+      </div>
+      <div class="msg-bubble">
+        Čau! Posílám ti ty poznámky co jsem sliboval ze statistiky.
+        <span class="flag">Sdílím přes Google Docs<span class="flag-note">&#9888; Google Docs je legitimní služba – proto zpráva nevypadá podezřele. Útočníci záměrně volí důvěryhodné platformy jako záminku.</span></span>,
+        přihlas se tam přes Google účet:
+        <span style="color:var(--blue);text-decoration:underline;" class="flag">docs.google.login-verify.com/share/...<span class="flag-note">&#9888; Falešná doména! „google" je zde jen slovo v názvu. Skutečný odkaz na Google Docs začíná vždy „docs.google.com" – nikdy nic jiného.</span></span><br><br>
+        Mám tam i tahák na zkoušku, ale rychle,
+        <span class="flag">link vyprší za hodinu<span class="flag-note">&#9888; Opět umělá urgence. Cílem je, aby ses neptal/a spolužáka jiným kanálem zda odkaz skutečně poslal.</span></span>.
+      </div>
+    </div>
+
+    <ul class="red-flags-list">
+      <li><div class="rf-num">1</div>Odkaz nevedl na „docs.google.com" ale na podvrženou doménu. Vždy zkontrolujte adresu před zadáním hesla.</li>
+      <li><div class="rf-num">2</div>Účet odesilatele mohl být sám kompromitován – i zpráva od skutečného přítele může být podvod.</li>
+      <li><div class="rf-num">3</div>„Přihlášení přes Google" na cizím webu = předání přihlašovacích údajů útočníkovi.</li>
+      <li><div class="rf-num">4</div>Ověřit na jiném kanálu (zavolat nebo napsat jinudy) stačí 30 sekund a zachrání přístup k účtu.</li>
+    </ul>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(4)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(6)">Jak se bránit →</button>
+    </div>
+  </div>
+
+  <!-- Slide 6: Obrana -->
+  <div class="slide" id="s6">
+    <div class="slide-label">Protiopatření</div>
+    <h2>Tři pravidla, která vás ochrání</h2>
+    <div class="subtitle">Nemusíte být IT expert. Stačí dodržovat tři jednoduché principy.</div>
+
+    <div class="defense-card">
+      <div class="def-num">1</div>
+      <div>
+        <h3>Pravidlo druhého kanálu</h3>
+        <p>Přišla urgentní zpráva e-mailem? Ověřte ji telefonicky. Přišla SMSkou? Zavolejte na číslo z webu instituce – ne na číslo ze zprávy. Přišla na Discordu? Napište tomu člověku jinudy. Trvá to 60 sekund a neutralizuje 90 % útoků.</p>
+      </div>
+    </div>
+
+    <div class="defense-card">
+      <div class="def-num">2</div>
+      <div>
+        <h3>Nikdy neklikat na odkaz, vždy psát adresu ručně</h3>
+        <p>Chcete ověřit stav zásilky od České pošty? Jděte na postaonline.cz sami – nevyužívejte odkaz ze zprávy. Totéž pro banku, finanční správu i cokoliv jiného. Odkaz v e-mailu nebo SMS je vždy potenciální past.</p>
+      </div>
+    </div>
+
+    <div class="defense-card">
+      <div class="def-num">3</div>
+      <div>
+        <h3>Dvoufaktorové ověření (2FA) na všech důležitých účtech</h3>
+        <p>I kdyby útočník získal vaše heslo, bez kódu z telefonu se nepřihlásí. Zapněte 2FA na e-mailu, bankovní aplikaci, sociálních sítích a všude kde to jde. Nastavení trvá 5 minut a je to nejsilnější technická pojistka, která existuje.</p>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(5)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(7)">Kvíz: otestuj se →</button>
+    </div>
+  </div>
+
+  <!-- Slide 7: Quiz -->
+  <div class="slide" id="s7">
+    <div class="slide-label">Kvíz</div>
+    <h2>Otestuj se</h2>
+    <div class="subtitle">Tři rychlé otázky k ověření toho, co jsme si řekli.</div>
+
+    <div id="q1-wrap">
+      <div class="quiz-q">1. Dostanete SMS od „ČSOB" s odkazem na zablokování přístupu. Co uděláte?</div>
+      <div class="quiz-options">
+        <button class="quiz-btn" onclick="answer(this, false, 'q1', 'Tohle je přesně co útočník chce. Odkaz v SMS vede na falešný web.')">Kliknu na odkaz a ověřím přihlášení</button>
+        <button class="quiz-btn" onclick="answer(this, true, 'q1', 'Správně! Zavoláte na číslo z webu banky (ne ze SMS) nebo otevřete aplikaci banky přímo.')">Zavolám na číslo banky z jejich webu, nebo otevřu aplikaci</button>
+        <button class="quiz-btn" onclick="answer(this, false, 'q1', 'Ignorovat úplně může být rizikové – raději situaci ověřte bezpečným kanálem.')">Zprávu ignoruji úplně</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div id="q2-wrap">
+      <div class="quiz-q">2. Kamarád vám na WhatsAppu pošle odkaz s žádostí o přihlášení přes Google. Doména je „docs.google.verify-login.com". Je to legitimní?</div>
+      <div class="quiz-options">
+        <button class="quiz-btn" onclick="answer(this, false, 'q2', 'Slovo „google" v doméně nic nezaručuje. Skutečné Google Docs jsou vždy na docs.google.com.')">Ano, je tam slovo „google"</button>
+        <button class="quiz-btn" onclick="answer(this, true, 'q2', 'Přesně tak! Doména docs.google.com je legitimní. Cokoliv jiného s „google" uvnitř je podvrh.')">Ne, doména musí být přesně docs.google.com</button>
+        <button class="quiz-btn" onclick="answer(this, false, 'q2', 'WhatsApp nijak negarantuje bezpečnost odkazů. Účet kamaráda mohl být sám napaden.')">Ano, přišlo to od kamaráda</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div id="q3-wrap">
+      <div class="quiz-q">3. Proč je e-mail slibující vrácení peněz (přeplatek daně) zákeřnější než e-mail hrozící problémem?</div>
+      <div class="quiz-options">
+        <button class="quiz-btn" onclick="answer(this, false, 'q3', 'Oba typy e-mailů mohou být podvod. Typ útoku nesouvisí s délkou.')">Je delší a tedy věrohodnější</button>
+        <button class="quiz-btn" onclick="answer(this, false, 'q3', 'Naopak – pozitivní zprávy nás méně varují. Finanční správa navíc komunikuje výhradně přes datovou schránku.')">Přichází od státní instituce, ta je vždy důvěryhodná</button>
+        <button class="quiz-btn" onclick="answer(this, true, 'q3', 'Správně! Na výhodu reagujeme méně kriticky než na hrozbu. Proto pozitivní phishing funguje tak dobře.')">Radost z výhody vypíná ostražitost více než strach</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(6)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(8)">Závěr →</button>
+    </div>
+  </div>
+
+  <!-- Slide 8: Závěr -->
+  <div class="slide" id="s8">
+    <div class="slide-label">Závěr</div>
+    <h2>Co si odnést domů</h2>
+    <div class="subtitle">Sociální inženýrství existuje tak dlouho, dokud existují lidé. S&nbsp;pomocí AI se stalo nebezpečnějším než kdykoli dřív – ale základní obrana zůstává stejná.</div>
+
+    <div class="final-grid">
+      <div class="final-card">
+        <h4 style="color:var(--red)">Jak útočníci myslí</h4>
+        <ul>
+          <li>Hledají nejslabší článek – ne software, ale lidi</li>
+          <li>Využívají emoce: strach, radost, zvědavost, respekt k autoritě</li>
+          <li>AI odstraňuje pravopisné chyby – starý způsob odhalení mizí</li>
+          <li>Personalizace je snadná – stačí pár veřejných informací</li>
+        </ul>
+      </div>
+      <div class="final-card">
+        <h4 style="color:var(--green)">Vaše obrana</h4>
+        <ul>
+          <li>Urgentní zpráva → vždy ověřit druhým kanálem</li>
+          <li>Odkaz z e-mailu/SMS → nikdy neklikat, vždy psát adresu ručně</li>
+          <li>„Přihlásit přes Google/Facebook" → zkontrolovat doménu</li>
+          <li>2FA zapnout na e-mailu, bance a sociálních sítích</li>
+          <li>Podezřelou zprávu přeposlat IT gramotné osobě</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Budoucnost:</strong> Deepfake videa a klonování hlasu umožní brzy podvrhnout i videohovor nebo telefonát od „příbuzného". Pravidlo druhého kanálu zůstává obranou i tehdy.
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center;">
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:0.5rem;">Školení dokončeno · Kryptologie LS 2026</div>
+      <div style="font-size:1rem;font-weight:600;color:var(--text);">Dominik Jakubec · VŠB-TUO</div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="go(7)">← Zpět</button>
+      <button class="btn btn-primary" onclick="go(1)">&#8635; Začít znovu</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const total = 8;
+  let current = 1;
+
+  function go(n) {
+    document.getElementById('s' + current).classList.remove('active');
+    current = n;
+    document.getElementById('s' + current).classList.add('active');
+    document.getElementById('counter').textContent = current + ' / ' + total;
+    document.getElementById('prog').style.width = ((current / total) * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function answer(btn, correct, qid, explanation) {
+    const wrap = document.getElementById(qid + '-wrap');
+    const btns = wrap.querySelectorAll('.quiz-btn');
+    btns.forEach(b => b.disabled = true);
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct) {
+      btns.forEach(b => { if (b !== btn) b.style.opacity = '0.4'; });
+    }
+    const fb = document.getElementById(qid + '-fb');
+    fb.textContent = (correct ? '✓ Správně! ' : '✗ Bohužel ne. ') + explanation;
+    fb.style.borderColor = correct ? 'var(--green-border)' : 'var(--red-border)';
+    fb.style.background = correct ? 'var(--green-bg)' : 'var(--red-bg)';
+    fb.style.color = correct ? 'var(--green)' : 'var(--red)';
+    fb.classList.add('show');
+  }
+
+  document.getElementById('prog').style.width = ((1 / total) * 100) + '%';
+</script>
+</body>
+</html>
